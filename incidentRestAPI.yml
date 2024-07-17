@@ -17,61 +17,65 @@ paths:
       description: creates a new incident in myIT and returns said incident.
 
       requestBody:
-        description: The values to intially write to the incident. 'partnerId' must either be in the body OR in the query. Any attachments must be base64 encoded.
+        description: The values to intially write to the incident.
         content:
           application/json:
             schema:
               type: object
               properties:
                 partnerId:
+                  description: the id of the partner system, agreed upon with the MyIT team.
+                  example: "SystemX"
                   type: string
-                assignment_group:
-                  type: string
-                caller_id:
-                  type: string
-                category:
-                  type: string
-                cmdb_ci:
-                  type: string
-                contact_type:
+                partnerIncidentId:
+                  description: your internal id of the incident, for your reference.
+                  example: "1234567890"
                   type: string
                 description:
-                  type: string
-                impact:
-                  type: number
-                location:
-                  type: string
-                service_offering:
+                  description: the descriptive title of the incident.
+                  example: "Some problem with something"
                   type: string
                 short_description:
+                  description: the description of the incident, describing the situation in detail.
+                  example: "There is a complicated problem with the incident rest api - HELP!"
                   type: string
-                subcategory:
+                location:
+                  description: the name or sys-id of the concerned location. If you don't know what to put here, please ask your swisspost contact.
+                  example: "afeeadcb8776c6103efc00000000"
                   type: string
-                u_causing_ci:
+                assignment_group:
+                  description: the name or sys-id of the assignment_group this incident should be assigned to. If you don't know what to put here, please ask your swisspost contact.
+                  example: "DEVOPS-MYIT"
+                  type: string
+                cmdb_ci:
+                  description: the name or sys-id of the concerned configuration item. If you don't know what to put here, please ask your swisspost contact.
+                  example: "w010xq"
+                  type: string
+                causing_ci:
+                  description: the name or sys-id of the underlying causing configuration item. If you don't know what to put here, please ask your swisspost contact.
+                  example: "w010xq"
                   type: string
                 attachments:
+                  description: any attachments you'd like to add to the incident. The content must be base64 encoded.
                   type: array
                   items:
                     type: object
                     properties:
                       fileName:
+                        description: the name of the file
+                        example: "picture_of_the_problem.png"
                         type: string
                       content:
                         type: string
+                        description: the content of the file in base64
+                        example: c25lYWt5
                         format: byte
               required:
-                - caller_id
+                - partnerId
+                - partnerIncidentId
+                - description
                 - short_description
-                - service_offering
-                - assignment_group
-                
-      parameters:
-        - name: partnerId
-          in: query
-          description: the id of the partner system, agreed upon with the myIT team. May be sent as a query param OR in the body.
-          schema:
-            type: string
-          required: true
+                - causing_ci
 
       responses:
         '200':
@@ -85,13 +89,10 @@ paths:
                   metadata:
                     type: object
                     example: {
-                      "Caveat": "THIS IS PRE-ALPHA CODE AND SUBJECT TO CHANGE AT ANY TIM(E)!",
-                      "git": "IncidentRestApi-0.0.1+70-dd86b01",
-                      "build": "2023-10-24T06:19:31.328Z",
-                      "config": "test",
-                      "partnerId": "test",
-                      "server_system_time": "2023-10-24T06:23:41.089Z"
-                      }
+                      "config": "SystemX",
+                      "partnerId": "SystemX",
+                      "server_system_time": "2020-10-24T06:23:41.089Z"
+                    }
 
                   message:
                     type: string
@@ -100,30 +101,54 @@ paths:
                   data:
                     type: object
                     example: {
-                       "category": "service_request",
+                        "incidentId": "6d101e0487e3ca903ef00000000000",
                         "number": "INC0000001",
+                        "partnerIncidentId": "1234567890",
+                        "description" : "Some problem with something",
+                        "short_description": "There is a complicated problem with the incident rest api - HELP!",
+                        "state": 1,
                         "opened_at": "1997-09-08T05:55:00Z",
+                        "sys_updated_on": "2024-07-17T14:36:59Z",
                         "opened_by": {
-                            "active": true,
-                            "sys_class_name": "sys_user",
-                            "sys_id": "a6fb235587fc71503efcec0000000000"
+                            "first_name": "Example",
+                            "last_name": "Name",
+                            "user_name": "example_name"
                           },
-                        "priority": 4,
-                        "severity": 3,
-                        "sys_class_name": "incident",
-                        "sys_id": "00000000000000000000000000000001",
+                        "assignment_group": {
+                          "description": "Example group",
+                          "name": "Example groupname"
+                        },
+                        "location": {
+                        "city": "Bern",
+                        "cmn_location_type": "room",
+                        "country": "Switzerland",
+                        "full_name": "CH/Bern/Viktoriastrasse 21/Viktoriastrasse 21/1.UG/001",
+                        "name": "001"
+                        },
+                        "causing_ci": {
+                          "asset_tag": "123456789",
+                          "model_id": {
+                            "display_name": "Lenovo ThinkPad P16 Gen1",
+                            "name": "ThinkPad P16 Gen1",
+                            "sys_id": "70a44cbf87f739d06d000000000000",
+                          },
+                          "name": "example hostname",
+                          "operational_status": 1,
+                          "serial_number": "ABCD12345",
+                          "sys_id": "acba0c3f87ff75503ef0000000000000",
+                        },
                         "attachments": [
                         {
                           "filename": "thisIsAFileName.pdf",
                           "content_type": "application/pdf",
-                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e123345678902345678"
+                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e12334567890000000"
                         }
                       ]
                     }
 
         '400':
           description: bad request
-          content: 
+          content:
             application/json:
               schema:
                 type: object
@@ -153,6 +178,22 @@ paths:
                   status:
                     type: string
                     example: "failure"
+        '500':
+          description: internal server error
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "The action failed due to a business rule. Message: [\"short_description is mandatory.\",\"partnerIncidentId is mandatory.\"]"
+                  status:
+                    type: integer
+                    example: 500
 
     get:
       summary: fetch an existing incident
@@ -162,18 +203,21 @@ paths:
           in: query
           required: true
           description: The id of the partner system, to be agreed upon with the MyIT team.
+          example: "SystemX"
           schema:
             type: string
         - name: incidentId
           in: query
-          required: false
+          required: true
           description: The MyIT-internal id of the incident.
+          example: 6d101e0487e3ca903ef00000000000
           schema:
             type: string
         - name: partnerIncidentId
           in: query
-          required: false
-          description: the vendor-side id of the incident.
+          required: true
+          description: your internal id of the incident, for your reference.
+          example: "1234567890"
           schema:
             type: string
       responses:
@@ -187,117 +231,47 @@ paths:
                   metadata:
                     type: object
                     example: {
-                      "git": "IncidentRestApi-0.0.1+70-dd86b01",
-                      "build": "2023-10-24T06:19:31.328Z",
-                      "partnerId": "vendorName",
-                      "server_system_time": "2023-10-24T06:23:41.089Z"
-                      }
+                      "config": "SystemX",
+                      "partnerId": "SystemX",
+                      "server_system_time": "2020-10-24T06:23:41.089Z"
+                    }
                   data:
                     type: object
                     example: {
-                      "needs_attention": false,
-                      "number": "INC0000001",
-                      "opened_at": "2024-06-25T14:33:52Z",
-                      "opened_by": {
-                          "first_name": "Technical",
-                          "last_name": "Rest",
-                          "sys_id": "a6fb235587fc71503efcec230cbb0000",
-                          "user_name": "technical_rest"
-                      },
-                      "priority": 1,
-                      "state": 1,
-                      "sys_created_by": "technical_rest",
-                      "sys_updated_by": "system",
-                      "sys_updated_on": "2024-06-26T12:34:48Z",
-                      "u_tracker_group": {
-                          "active": true,
-                          "name": "FAD-MYIT",
-                          "sys_id": "0b95f94c87808e503efcec230cbb0000",
-                      },
-                      "worknotes": [
-                          {
-                              "element": "work_notes",
-                              "element_id": "756c34c9878bc2906dc863540cbb0000",
-                              "name": "incident",
-                              "sys_created_by": "technical_rest",
-                              "sys_created_on": "2024-06-25T14:34:48Z",
-                              "sys_id": "239cb8c9878bc2906dc863540cbb0000",
-                              "value": "this is a worknote"
-                          }
-                      ],
-                      "subcategory": "security",
-                      "incidentId": "756c34c9878bc2906dc863540cbb0000",
-                      "partnerId": "vendorName",
-                      "short_description": "Test",
-                      "category": "incident",
-                      "impact": 1,
-                      "location": {
-                          "city": "Bern",
-                          "cmn_location_type": "city",
-                          "country": "Switzerland",
-                          "full_name": "CH/Bern",
-                          "name": "Bern",
-                          "state": "BE"
-                      },
-                      "contact_type": "monitoring",
-                      "caller_id": {
-                          "active": false,
-                          "email": "User@example.com",
-                          "first_name": "James",
-                          "last_name": "Bond",
-                          "sys_id": "d8f57f140b20220050192f15d6670000",
-                          "user_name": "james.bond"
-                      },
-                      "service_offering": {
-                          "busines_criticality": "2 - somewhat critical",
-                          "life_cycle_stage": "Ideation",
-                          "name": "Test ",
-                          "sys_class_name": "service_offering",
-                          "sys_id": "30592d0187e0c6906dc863540cbb0000",
-                          "used_for": "Production"
-                      },
-                      "cmdb_ci": {
-                          "asset_tag": "23282978",
-                          "comments": "This is a comment",
-                          "install_status": 1,
-                          "life_cycle_stage": "Operational",
-                          "life_cycle_stage_status": "In Use",
-                          "manufacturer": {
-                              "city": "Morrisville",
-                              "country": "USA",
-                              "name": "Lenovo",
-                              "sys_id": "aa0a6df8c611227601cd2ed459890000"
+                        "incidentId": "6d101e0487e3ca903ef00000000000",
+                        "number": "INC0000001",
+                        "partnerIncidentId": "12345",
+                        "short_description": "descriptive text",
+                        "state": 1,
+                        "opened_at": "1997-09-08T05:55:00Z",
+                        "sys_updated_on": "2024-07-17T14:36:59Z",
+                        "opened_by": {
+                            "first_name": "Example",
+                            "last_name": "Name",
+                            "user_name": "example_name"
                           },
+                        "assignment_group": {
+                          "description": "Example group",
+                          "name": "Example groupname"
+                        },
+                        "causing_ci": {
+                          "asset_tag": "123456789",
                           "model_id": {
-                              "display_name": "Lenovo Laptop XYZ",
-                              "life_cycle_stage": "Operational",
-                              "life_cycle_stage_status": "In Use",
-                              "manufacturer": {
-                                  "city": "Morrisville",
-                                  "country": "USA",
-                                  "name": "Lenovo",
-                                  "sys_id": "aa0a6df8c611227601cd2ed459890000"
-                              },
-                              "name": "ThinkPad XYZ",
-                              "sys_id": "70a44cbf87f739d06dc863540cbb0000"
+                            "display_name": "Lenovo ThinkPad P16 Gen1",
+                            "name": "ThinkPad P16 Gen1",
+                            "sys_id": "70a44cbf87f739d06d000000000000",
                           },
-                          "name": "w01000",
+                          "name": "example hostname",
                           "operational_status": 1,
-                          "serial_number": "PF3T0000",
-                          "sys_id": "acba0c3f87ff75503efcec230cbb0000",
-                          "sys_updated_on": "2024-06-18T23:12:54Z"
-                      },
-                      "assignment_group": {
-                          "name": "FAD-MYIT",
-                          "sys_id": "0b95f94c87808e503efcec230cbb0000",
-                          "u_group_type": "assignment_group"
-                      },
-                      "attachments": [
-                          {
-                              "filename": "thisIsANewFile.txt",
-                              "content_type": "application/json",
-                              "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=909cb8c9878bc2906dc863540cbb0000"
-                          }
+                          "serial_number": "ABCD12345",
+                          "sys_id": "acba0c3f87ff75503ef0000000000000",
+                        },
+                        "attachments": [
+                        {
+                          "filename": "thisIsAFileName.pdf",
+                          "content_type": "application/pdf",
+                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e12334567890000000"
+                        }
                       ]
                     }
         '400':
@@ -335,7 +309,7 @@ paths:
                     
     patch:
       summary: update an incident
-      description: updates an incident that already exists in myIT. 'partnerId', 'incidentId' OR 'partnerIncidentId' must either be in the body or the query params.
+      description: updates an incident that already exists in myIT. 'partnerId' AND 'incidentId' OR 'partnerIncidentId' must either be in the body or the query params.
       requestBody:
         content:
           application/json:
@@ -343,42 +317,26 @@ paths:
               type: object
               properties:
                 partnerId:
+                  description: the id of the partner system, agreed upon with the MyIT team.
+                  example: "SystemX"
                   type: string
                 incidentId:
+                  description: The MyIT-internal id of the incident.
+                  example: 43c569a98771f5106dc8630000000000
                   type: string
                 partnerIncidentId:
+                  description: your internal id of the incident, for your reference.
+                  example: "1234567890"
                   type: string
                 short_description:
                   type: string
                   description: example field to update
-                attachments:
-                  type: array
-                  description: can also be used to add attachments
-                  items:
-                    type: object
-                    properties:
-                      fileName:
-                        type: string
-                      content:
-                        type: string
-                        format: byte
+                  example: this is an updated description of the problem
+
               required:
                 - partnerId
                 - incidentId
                 - partnerIncidentId
-
-            example: {
-              "partnerId":"systemX",
-              "incidentId":"43c569a98771f5106dc8630000000000",
-              "partnerIncidentId":"INC0000001",
-              "short_description": "new short description",
-              "attachments": [
-                {
-                  "fileName" : "thisIsANewFile.txt",
-                  "content" : "c25lYWt5"
-                }
-              ]
-            }
 
       responses:
         '200':
@@ -391,12 +349,9 @@ paths:
                   metadata:
                     type: object
                     example: {
-                          "Caveat": "THIS IS PRE-ALPHA CODE AND SUBJECT TO CHANGE AT ANY TIM(E)!",
-                          "git": "IncidentRestApi-0.0.1+70-dd86b01-dirty",
-                          "build": "2023-10-24T14:54:24.706Z",
-                          "config": "systemId",
-                          "partnerId": "systemId",
-                          "server_system_time": "2023-10-27T07:02:46.583Z"
+                      "config": "SystemX",
+                      "partnerId": "SystemX",
+                      "server_system_time": "2020-10-24T06:23:41.089Z"
                     }
 
                   message:
@@ -406,19 +361,41 @@ paths:
                   data:
                     type: object
                     example: {
-                          "number": "INC0000001",
-                          "short_description": "new short description",
-                          "priority": 4,
-                          "opened_by:": {
-                              "active": true,
-                              "sys_class_name": "sys_user",
-                              "sys_id": "a6fb235587fc71503efcec000000000"
+                        "incidentId": "6d101e0487e3ca903ef00000000000",
+                        "number": "INC0000001",
+                        "partnerIncidentId": "1234567890",
+                        "short_description": "this is an updated description of the problem",
+                        "state": 1,
+                        "opened_at": "1997-09-08T05:55:00Z",
+                        "sys_updated_on": "2024-07-17T14:36:59Z",
+                        "opened_by": {
+                            "first_name": "Example",
+                            "last_name": "Name",
+                            "user_name": "example_name"
                           },
-                          "severity": 3,
-                          "opened_at": "2023-10-10T07:22:04Z",
-                          "category": "service_request",
-                          "incident_id": "43c569a98771f5106dc8630000000000",
-                          "class": "incident"
+                        "assignment_group": {
+                          "description": "Example group",
+                          "name": "Example groupname"
+                        },
+                        "causing_ci": {
+                          "asset_tag": "123456789",
+                          "model_id": {
+                            "display_name": "Lenovo ThinkPad P16 Gen1",
+                            "name": "ThinkPad P16 Gen1",
+                            "sys_id": "70a44cbf87f739d06d000000000000",
+                          },
+                          "name": "example hostname",
+                          "operational_status": 1,
+                          "serial_number": "ABCD12345",
+                          "sys_id": "acba0c3f87ff75503ef0000000000000",
+                        },
+                        "attachments": [
+                        {
+                          "filename": "thisIsAFileName.pdf",
+                          "content_type": "application/pdf",
+                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e12334567890000000"
+                        }
+                      ]
                     }
 
         '400':
@@ -992,11 +969,10 @@ paths:
 
   /callback:
     post:
-      summary: receive incident change notifications
-      description: Sends a callbackUrl via POST to the specified address when an incident changes.
+      summary: Notification via POST request
+      description: Sends a POST request to the partner's callback URL when an incident changes containing the complete incident.
       requestBody:
-        description: Callback information to be sent when an incident changes.
-        required: true
+        description: The incident data sent to the callback URL.
         content:
           application/json:
             schema:
@@ -1004,14 +980,14 @@ paths:
               properties:
                 metaData:
                   type: string
-                  example: "The incident has changed. This is the newest state: "
+                  example: "The incident has changed. This is the newest state:"
                 number:
                   type: string
                   example: "INC0000001"
                 time_worked:
                   type: string
                   example: "1970-01-01 01:54:46"
-                short_description: 
+                short_description:
                   type: string
                   example: "update"
                 priority:
@@ -1032,96 +1008,33 @@ paths:
                 class:
                   type: string
                   example: "incident"
-
       responses:
         '200':
-          description: Callback request successful.
-        '400':
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "MyItRestException"
-                  message:
-                    type: string
-                    example: "'incidentId' or 'callbackUrl' not specified"
-                  status:
-                    type: integer
-                    example: 400
-        '403':
-          description: Forbidden.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  clazz:
-                    type: string
-                    example: "IllegalAccessException"
-                  status:
-                    type: integer
-                    example: 403
-                  message:
-                    type: string
-                    example: "You are not authorized to access this API"
+          description: Callback request description. Actual response handling is managed by the receiving system.
+        'default':
+          description: General response. Actual response handling is managed by the receiving system.
+
     get:
-      summary: receive incident change notifications via query parameters
-      description: Sends a callbackUrl via GET with incidentId and callbackUrl as query parameters when an incident changes.
+      summary: Notification via GET request
+      description: Sends a GET request to the partner's callback URL with incidentId and callbackUrl as query parameters when an incident changes. This URL can be queried with GET to then receive the changed incident.
       parameters:
         - name: incidentId
           in: query
-          required: true
           description: The ID of the incident that changed.
           schema:
             type: string
             example: f806607f87a6f9d03efcec0000000000
         - name: callbackUrl
           in: query
-          required: true
-          description: The URL where the callback should be sent.
+          description: The readymade URL leading to the changed incident.
           schema:
             type: string
             example: https://<MyIT-url>/api/x_ssagd_inc_rest/rest/incident?partnerId=systemX&incidentId=f806607f87a6f9d03efcec0000000000
       responses:
         '200':
-          description: Callback request successful.
-        '400':
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "MyItRestException"
-                  message:
-                    type: string
-                    example: "'incidentId' or 'callbackUrl' not specified"
-                  status:
-                    type: integer
-                    example: 400
-        '403':
-          description: Forbidden.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  clazz:
-                    type: string
-                    example: "IllegalAccessException"
-                  status:
-                    type: integer
-                    example: 403
-                  message:
-                    type: string
-                    example: "You are not authorized to access this API"
-
+          description: Callback request description. Actual response handling is managed by the receiving system.
+        'default':
+          description: General response. Actual response handling is managed by the receiving system.
 
 components:
   securitySchemes:
