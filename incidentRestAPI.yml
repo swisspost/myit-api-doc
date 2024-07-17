@@ -1,0 +1,1131 @@
+openapi: '3.0.2'
+info:
+  title: Incident REST API
+  description: handles communication between the MyIT incident system and partner systems.
+  version: '1.0.0'
+
+servers:
+  - url: https://<MyIT-url>/api/x_ssagd_inc_rest/rest
+
+security:
+  - BasicAuth: []
+  
+paths:
+  /incident:
+    post:
+      summary: create a new incident
+      description: creates a new incident in myIT and returns said incident.
+
+      requestBody:
+        description: The values to intially write to the incident. 'partnerId' must either be in the body OR in the query. Any attachments must be base64 encoded.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partnerId:
+                  type: string
+                assignment_group:
+                  type: string
+                caller_id:
+                  type: string
+                category:
+                  type: string
+                cmdb_ci:
+                  type: string
+                contact_type:
+                  type: string
+                description:
+                  type: string
+                impact:
+                  type: number
+                location:
+                  type: string
+                service_offering:
+                  type: string
+                short_description:
+                  type: string
+                subcategory:
+                  type: string
+                u_causing_ci:
+                  type: string
+                attachments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      fileName:
+                        type: string
+                      content:
+                        type: string
+                        format: byte
+              required:
+                - caller_id
+                - short_description
+                - service_offering
+                - assignment_group
+                
+      parameters:
+        - name: partnerId
+          in: query
+          description: the id of the partner system, agreed upon with the myIT team. May be sent as a query param OR in the body.
+          schema:
+            type: string
+          required: true
+
+      responses:
+        '200':
+          description: the created incident
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+
+                  metadata:
+                    type: object
+                    example: {
+                      "Caveat": "THIS IS PRE-ALPHA CODE AND SUBJECT TO CHANGE AT ANY TIM(E)!",
+                      "git": "IncidentRestApi-0.0.1+70-dd86b01",
+                      "build": "2023-10-24T06:19:31.328Z",
+                      "config": "test",
+                      "partnerId": "test",
+                      "server_system_time": "2023-10-24T06:23:41.089Z"
+                      }
+
+                  message:
+                    type: string
+                    example: "Incident 00000000000000000000000000000001 created."
+
+                  data:
+                    type: object
+                    example: {
+                       "category": "service_request",
+                        "number": "INC0000001",
+                        "opened_at": "1997-09-08T05:55:00Z",
+                        "opened_by": {
+                            "active": true,
+                            "sys_class_name": "sys_user",
+                            "sys_id": "a6fb235587fc71503efcec0000000000"
+                          },
+                        "priority": 4,
+                        "severity": 3,
+                        "sys_class_name": "incident",
+                        "sys_id": "00000000000000000000000000000001",
+                        "attachments": [
+                        {
+                          "filename": "thisIsAFileName.pdf",
+                          "content_type": "application/pdf",
+                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e123345678902345678"
+                        }
+                      ]
+                    }
+
+        '400':
+          description: bad request
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "'partnerId' not specified"
+                  status:
+                    type: integer
+                    example: 400
+        '401':
+          description: unauthorized
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    example: {
+                      "message": "User Not Authenticated",
+                      "detail": "Required to provide Auth information"
+                    }
+                  status:
+                    type: string
+                    example: "failure"
+
+    get:
+      summary: fetch an existing incident
+      description: Requires 'partnerId' AND either 'incidentId' OR 'partnerIncidentId' and returns the corresponding incident.
+      parameters:
+        - name: partnerId
+          in: query
+          required: true
+          description: The id of the partner system, to be agreed upon with the MyIT team.
+          schema:
+            type: string
+        - name: incidentId
+          in: query
+          required: false
+          description: The MyIT-internal id of the incident.
+          schema:
+            type: string
+        - name: partnerIncidentId
+          in: query
+          required: false
+          description: the vendor-side id of the incident.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: the incident corresponding to the incidentId or partnerIncidentId.
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+                    example: {
+                      "git": "IncidentRestApi-0.0.1+70-dd86b01",
+                      "build": "2023-10-24T06:19:31.328Z",
+                      "partnerId": "vendorName",
+                      "server_system_time": "2023-10-24T06:23:41.089Z"
+                      }
+                  data:
+                    type: object
+                    example: {
+                      "needs_attention": false,
+                      "number": "INC0000001",
+                      "opened_at": "2024-06-25T14:33:52Z",
+                      "opened_by": {
+                          "first_name": "Technical",
+                          "last_name": "Rest",
+                          "sys_id": "a6fb235587fc71503efcec230cbb0000",
+                          "user_name": "technical_rest"
+                      },
+                      "priority": 1,
+                      "state": 1,
+                      "sys_created_by": "technical_rest",
+                      "sys_updated_by": "system",
+                      "sys_updated_on": "2024-06-26T12:34:48Z",
+                      "u_tracker_group": {
+                          "active": true,
+                          "name": "FAD-MYIT",
+                          "sys_id": "0b95f94c87808e503efcec230cbb0000",
+                      },
+                      "worknotes": [
+                          {
+                              "element": "work_notes",
+                              "element_id": "756c34c9878bc2906dc863540cbb0000",
+                              "name": "incident",
+                              "sys_created_by": "technical_rest",
+                              "sys_created_on": "2024-06-25T14:34:48Z",
+                              "sys_id": "239cb8c9878bc2906dc863540cbb0000",
+                              "value": "this is a worknote"
+                          }
+                      ],
+                      "subcategory": "security",
+                      "incidentId": "756c34c9878bc2906dc863540cbb0000",
+                      "partnerId": "vendorName",
+                      "short_description": "Test",
+                      "category": "incident",
+                      "impact": 1,
+                      "location": {
+                          "city": "Bern",
+                          "cmn_location_type": "city",
+                          "country": "Switzerland",
+                          "full_name": "CH/Bern",
+                          "name": "Bern",
+                          "state": "BE"
+                      },
+                      "contact_type": "monitoring",
+                      "caller_id": {
+                          "active": false,
+                          "email": "User@example.com",
+                          "first_name": "James",
+                          "last_name": "Bond",
+                          "sys_id": "d8f57f140b20220050192f15d6670000",
+                          "user_name": "james.bond"
+                      },
+                      "service_offering": {
+                          "busines_criticality": "2 - somewhat critical",
+                          "life_cycle_stage": "Ideation",
+                          "name": "Test ",
+                          "sys_class_name": "service_offering",
+                          "sys_id": "30592d0187e0c6906dc863540cbb0000",
+                          "used_for": "Production"
+                      },
+                      "cmdb_ci": {
+                          "asset_tag": "23282978",
+                          "comments": "This is a comment",
+                          "install_status": 1,
+                          "life_cycle_stage": "Operational",
+                          "life_cycle_stage_status": "In Use",
+                          "manufacturer": {
+                              "city": "Morrisville",
+                              "country": "USA",
+                              "name": "Lenovo",
+                              "sys_id": "aa0a6df8c611227601cd2ed459890000"
+                          },
+                          "model_id": {
+                              "display_name": "Lenovo Laptop XYZ",
+                              "life_cycle_stage": "Operational",
+                              "life_cycle_stage_status": "In Use",
+                              "manufacturer": {
+                                  "city": "Morrisville",
+                                  "country": "USA",
+                                  "name": "Lenovo",
+                                  "sys_id": "aa0a6df8c611227601cd2ed459890000"
+                              },
+                              "name": "ThinkPad XYZ",
+                              "sys_id": "70a44cbf87f739d06dc863540cbb0000"
+                          },
+                          "name": "w01000",
+                          "operational_status": 1,
+                          "serial_number": "PF3T0000",
+                          "sys_id": "acba0c3f87ff75503efcec230cbb0000",
+                          "sys_updated_on": "2024-06-18T23:12:54Z"
+                      },
+                      "assignment_group": {
+                          "name": "FAD-MYIT",
+                          "sys_id": "0b95f94c87808e503efcec230cbb0000",
+                          "u_group_type": "assignment_group"
+                      },
+                      "attachments": [
+                          {
+                              "filename": "thisIsANewFile.txt",
+                              "content_type": "application/json",
+                              "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=909cb8c9878bc2906dc863540cbb0000"
+                          }
+                      ]
+                    }
+        '400':
+          description: bad request
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "'partnerId' not specified"
+                  status:
+                    type: integer
+                    example: 400
+        '401':
+          description: unauthorized
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    example: {
+                      "message": "User Not Authenticated",
+                      "detail": "Required to provide Auth information"
+                    }
+                  status:
+                    type: string
+                    example: "failure"
+                    
+    patch:
+      summary: update an incident
+      description: updates an incident that already exists in myIT. 'partnerId', 'incidentId' OR 'partnerIncidentId' must either be in the body or the query params.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partnerId:
+                  type: string
+                incidentId:
+                  type: string
+                partnerIncidentId:
+                  type: string
+                short_description:
+                  type: string
+                  description: example field to update
+                attachments:
+                  type: array
+                  description: can also be used to add attachments
+                  items:
+                    type: object
+                    properties:
+                      fileName:
+                        type: string
+                      content:
+                        type: string
+                        format: byte
+              required:
+                - partnerId
+                - incidentId
+                - partnerIncidentId
+
+            example: {
+              "partnerId":"systemX",
+              "incidentId":"43c569a98771f5106dc8630000000000",
+              "partnerIncidentId":"INC0000001",
+              "short_description": "new short description",
+              "attachments": [
+                {
+                  "fileName" : "thisIsANewFile.txt",
+                  "content" : "c25lYWt5"
+                }
+              ]
+            }
+
+      responses:
+        '200':
+          description: the updated incident
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+                    example: {
+                          "Caveat": "THIS IS PRE-ALPHA CODE AND SUBJECT TO CHANGE AT ANY TIM(E)!",
+                          "git": "IncidentRestApi-0.0.1+70-dd86b01-dirty",
+                          "build": "2023-10-24T14:54:24.706Z",
+                          "config": "systemId",
+                          "partnerId": "systemId",
+                          "server_system_time": "2023-10-27T07:02:46.583Z"
+                    }
+
+                  message:
+                    type: string
+                    example: "Incident 43c569a98771f5106dc8630000000000 updated."
+
+                  data:
+                    type: object
+                    example: {
+                          "number": "INC0000001",
+                          "short_description": "new short description",
+                          "priority": 4,
+                          "opened_by:": {
+                              "active": true,
+                              "sys_class_name": "sys_user",
+                              "sys_id": "a6fb235587fc71503efcec000000000"
+                          },
+                          "severity": 3,
+                          "opened_at": "2023-10-10T07:22:04Z",
+                          "category": "service_request",
+                          "incident_id": "43c569a98771f5106dc8630000000000",
+                          "class": "incident"
+                    }
+
+        '400':
+          description: bad request
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "'partnerId' not specified"
+                  status:
+                    type: integer
+                    example: 400
+        '401':
+          description: unauthorized
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    example: {
+                      "message": "User Not Authenticated",
+                      "detail": "Required to provide Auth information"
+                    }
+                  status:
+                    type: string
+                    example: "failure"
+
+  /incident/addAttachment:
+    patch:
+      summary: add attachments
+      description: adds attachments to an incident that already exists in myIT. 'partnerId' AND either 'incidentId' OR 'partnerIncidentId' must either be in the body or the query params. Any attachments must be base64 encoded.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partnerId:
+                  type: string
+                incidentId:
+                  type: string
+                partnerIncidentId:
+                  type: string
+                attachments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      fileName:
+                        type: string
+                      content:
+                        type: string
+                        format: byte
+            example: {
+              "partnerId":"systemX",
+              "incidentId":"43c569a98771f5106dc8630000000000",
+              "partnerIncidentId":"INC0000001",
+              "attachments": [
+                {
+                  "fileName" : "thisIsAFileName.txt",
+                  "content" : "c25lYWt5"
+                }
+              ]
+            }
+
+      responses:
+        '200':
+          description: the updated incident
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+                    example: {
+                          "Caveat": "THIS IS PRE-ALPHA CODE AND SUBJECT TO CHANGE AT ANY TIM(E)!",
+                          "git": "IncidentRestApi-0.0.1+70-dd86b01-dirty",
+                          "build": "2023-10-24T14:54:24.706Z",
+                          "config": "systemId",
+                          "partnerId": "systemId",
+                          "server_system_time": "2023-10-27T07:02:46.583Z"
+                    }
+
+                  message:
+                    type: string
+                    example: "Attachment(s) added to Incident 43c569a98771f5106dc8630000000000."
+
+                  data:
+                    type: object
+                    example: {
+                          "number": "INC0000001",
+                          "short_description": "short description",
+                          "priority": 4,
+                          "opened_by:": {
+                              "active": true,
+                              "sys_class_name": "sys_user",
+                              "sys_id": "a6fb235587fc71503efcec000000000"
+                          },
+                          "severity": 3,
+                          "opened_at": "2023-10-10T07:22:04Z",
+                          "category": "service_request",
+                          "incident_id": "43c569a98771f5106dc8630000000000",
+                          "class": "incident",
+                          "attachments": [
+                            {
+                              "filename": "thisIsAFileName.txt",
+                              "content_type": "application/json",
+                              "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=af0192da874481234567890123456789"
+                            }
+                          ]
+                        
+                    }
+
+        '400':
+          description: bad request
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "content of attachment thisIsAFileName.txt is not valid base64."
+                  status:
+                    type: integer
+                    example: 400
+        '401':
+          description: unauthorized
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    example: {
+                      "message": "User Not Authenticated",
+                      "detail": "Required to provide Auth information"
+                    }
+                  status:
+                    type: string
+                    example: "failure"
+
+  /incident/addWorknote:
+    patch:
+      summary: add a worknote
+      description: adds a worknote to an incident that already exists in myIT. PartnerId AND either IncidentId OR partnerIncidentId must either be in the body or the query params.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partnerId:
+                  type: string
+                incidentId:
+                  type: string
+                partnerIncidentId:
+                  type: string
+                worknote:
+                  type: string
+
+      responses:
+        '200':
+          description: the updated incident
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+                    example: {
+                          "Caveat": "THIS IS PRE-ALPHA CODE AND SUBJECT TO CHANGE AT ANY TIM(E)!",
+                          "git": "IncidentRestApi-0.0.1+70-dd86b01-dirty",
+                          "build": "2023-10-24T14:54:24.706Z",
+                          "config": "systemId",
+                          "partnerId": "systemId",
+                          "server_system_time": "2023-10-27T07:02:46.583Z"
+                    }
+
+                  message:
+                    type: string
+                    example: "Worknote added to incident 43c569a98771f5106dc8630000000000."
+
+                  data:
+                    type: object
+                    example: {
+                          "number": "INC0000001",
+                          "short_description": "short description",
+                          "priority": 4,
+                          "opened_by:": {
+                              "active": true,
+                              "sys_class_name": "sys_user",
+                              "sys_id": "a6fb235587fc71503efcec000000000"
+                          },
+                          "severity": 3,
+                          "opened_at": "2023-10-10T07:22:04Z",
+                          "category": "service_request",
+                          "incident_id": "43c569a98771f5106dc8630000000000",
+                          "class": "incident",
+                          "worknotes": [
+                            {
+                              "sys_id" : "ta6fb235587fc71503efcec000000123",
+                              "sys_created_by" : "admin.user",
+                              "sys_created_on" : "2024-01-24T06:29:35Z",
+                              "value" : "worknote detailing progress on incident\r\nTest"
+                            }
+                          ]
+                    }
+
+        '400':
+          description: bad request
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "No worknote found in request body."
+                  status:
+                    type: integer
+                    example: 400
+        '401':
+          description: unauthorized
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    example: {
+                      "message": "User Not Authenticated",
+                      "detail": "Required to provide Auth information"
+                    }
+                  status:
+                    type: string
+                    example: "failure"
+
+  /incident/addComment:
+    patch:
+      summary: add a comment
+      description: adds a comment to an incident that already exists in myIT. 'partnerId' AND either 'incidentId' OR 'partnerIncidentId' must either be in the body or the query params.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partnerId:
+                  type: string
+                incidentId:
+                  type: string
+                partnerIncidentId:
+                  type: string
+                comment:
+                  type: string
+
+      responses:
+        '200':
+          description: the updated incident
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+                    example: {
+                          "Caveat": "THIS IS PRE-ALPHA CODE AND SUBJECT TO CHANGE AT ANY TIM(E)!",
+                          "git": "IncidentRestApi-0.0.1+70-dd86b01-dirty",
+                          "build": "2023-10-24T14:54:24.706Z",
+                          "config": "systemId",
+                          "partnerId": "systemId",
+                          "server_system_time": "2023-10-27T07:02:46.583Z"
+                    }
+
+                  message:
+                    type: string
+                    example: "Comment added to incident 43c569a98771f5106dc8630000000000."
+
+                  data:
+                    type: object
+                    example: {
+                          "number": "INC0000001",
+                          "short_description": "short description",
+                          "priority": 4,
+                          "opened_by:": {
+                              "active": true,
+                              "sys_class_name": "sys_user",
+                              "sys_id": "a6fb235587fc71503efcec000000000"
+                          },
+                          "severity": 3,
+                          "opened_at": "2023-10-10T07:22:04Z",
+                          "category": "service_request",
+                          "incident_id": "43c569a98771f5106dc8630000000000",
+                          "class": "incident",
+                          "comments": [
+                            {
+                              "sys_id" : "ta6fb235587fc71503efcec000000123",
+                              "sys_created_by" : "admin.user",
+                              "sys_created_on" : "2024-01-24T06:29:35Z",
+                              "value" : "Customer-facing comment, detailing progress on incident\r\nTest"
+                            }
+                          ]
+                    }
+
+        '400':
+          description: bad request
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "comment must be of type string."
+                  status:
+                    type: integer
+                    example: 400
+        '401':
+          description: unauthorized
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    example: {
+                      "message": "User Not Authenticated",
+                      "detail": "Required to provide Auth information"
+                    }
+                  status:
+                    type: string
+                    example: "failure"
+  
+  /incident/resolve:
+    patch:
+      summary: resolve an incident
+      description: resolves an incident in myIT. Requires a worknote. PartnerId AND either IncidentId OR partnerIncidentId must either be in the body or the query params.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partnerId:
+                  type: string
+                incidentId:
+                  type: string
+                partnerIncidentId:
+                  type: string
+                worknote:
+                  type: string
+              required:
+                - partnerId
+                - incidentId
+                - partnerIncidentId
+                - worknote
+
+
+      responses:
+        '200':
+          description: the resolved incident
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+                    example: {
+                          "Caveat": "THIS IS PRE-ALPHA CODE AND SUBJECT TO CHANGE AT ANY TIM(E)!",
+                          "git": "IncidentRestApi-0.0.1+70-dd86b01-dirty",
+                          "build": "2023-10-24T14:54:24.706Z",
+                          "config": "systemId",
+                          "partnerId": "systemId",
+                          "server_system_time": "2023-10-27T07:02:46.583Z"
+                    }
+
+                  message:
+                    type: string
+                    example: "Incident 43c569a98771f5106dc8630000000000 resolved."
+
+                  data:
+                    type: object
+                    example: {
+                          "number": "INC0000001",
+                          "short_description": "short description",
+                          "priority": 4,
+                          "opened_by:": {
+                              "active": true,
+                              "sys_class_name": "sys_user",
+                              "sys_id": "a6fb235587fc71503efcec000000000"
+                          },
+                          "severity": 3,
+                          "opened_at": "2023-10-10T07:22:04Z",
+                          "category": "service_request",
+                          "incident_id": "43c569a98771f5106dc8630000000000",
+                          "class": "incident",
+                          "worknotes": [
+                            {
+                              "sys_id" : "ta6fb235587fc71503efcec000000123",
+                              "sys_created_by" : "admin.user",
+                              "sys_created_on" : "2024-01-24T06:29:35Z",
+                              "value" : "reason for reopening incident\r\nTest"
+                            }
+                          ]
+                    }
+
+        '400':
+          description: bad request
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "No worknote found in request body."
+                  status:
+                    type: integer
+                    example: 400
+        '401':
+          description: unauthorized
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    example: {
+                      "message": "User Not Authenticated",
+                      "detail": "Required to provide Auth information"
+                    }
+                  status:
+                    type: string
+                    example: "failure"
+
+  /incident/reopen:
+    patch:
+      summary: reopen an incident
+      description: Reopens an incident in myIT that has status 'resolved'. Requires a worknote. PartnerId AND either IncidentId OR partnerIncidentId must either be in the body or the query params.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partnerId:
+                  type: string
+                incidentId:
+                  type: string
+                partnerIncidentId:
+                  type: string
+                worknote:
+                  type: string
+              required:
+                - partnerId
+                - incidentId
+                - partnerIncidentId
+                - worknote
+
+
+      responses:
+        '200':
+          description: the reopened incident
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+                    example: {
+                          "Caveat": "THIS IS PRE-ALPHA CODE AND SUBJECT TO CHANGE AT ANY TIM(E)!",
+                          "git": "IncidentRestApi-0.0.1+70-dd86b01-dirty",
+                          "build": "2023-10-24T14:54:24.706Z",
+                          "config": "systemId",
+                          "partnerId": "systemId",
+                          "server_system_time": "2023-10-27T07:02:46.583Z"
+                    }
+
+                  message:
+                    type: string
+                    example: "Incident 43c569a98771f5106dc8630000000000 reopened."
+
+                  data:
+                    type: object
+                    example: {
+                          "number": "INC0000001",
+                          "short_description": "short description",
+                          "priority": 4,
+                          "opened_by:": {
+                              "active": true,
+                              "sys_class_name": "sys_user",
+                              "sys_id": "a6fb235587fc71503efcec000000000"
+                          },
+                          "severity": 3,
+                          "opened_at": "2023-10-10T07:22:04Z",
+                          "category": "service_request",
+                          "incident_id": "43c569a98771f5106dc8630000000000",
+                          "class": "incident",
+                          "worknotes": [
+                            {
+                              "sys_id" : "ta6fb235587fc71503efcec000000123",
+                              "sys_created_by" : "admin.user",
+                              "sys_created_on" : "2024-01-24T06:29:35Z",
+                              "value" : "reason for reopening incident\r\nTest"
+                            }
+                          ]
+                    }
+
+        '400':
+          description: bad request
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "No worknote found in request body."
+                  status:
+                    type: integer
+                    example: 400
+        '401':
+          description: unauthorized
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    example: {
+                      "message": "User Not Authenticated",
+                      "detail": "Required to provide Auth information"
+                    }
+                  status:
+                    type: string
+                    example: "failure"
+
+  /callback:
+    post:
+      summary: receive incident change notifications
+      description: Sends a callbackUrl via POST to the specified address when an incident changes.
+      requestBody:
+        description: Callback information to be sent when an incident changes.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                metaData:
+                  type: string
+                  example: "The incident has changed. This is the newest state: "
+                number:
+                  type: string
+                  example: "INC0000001"
+                time_worked:
+                  type: string
+                  example: "1970-01-01 01:54:46"
+                short_description: 
+                  type: string
+                  example: "update"
+                priority:
+                  type: number
+                  example: 1
+                severity:
+                  type: number
+                  example: 2
+                opened_at:
+                  type: string
+                  example: "2023-11-23T09:16:47Z"
+                category:
+                  type: string
+                  example: "service_request"
+                incident_id:
+                  type: string
+                  example: "f806607f87a6f9d03efcec0000000000"
+                class:
+                  type: string
+                  example: "incident"
+
+      responses:
+        '200':
+          description: Callback request successful.
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "'incidentId' or 'callbackUrl' not specified"
+                  status:
+                    type: integer
+                    example: 400
+        '403':
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clazz:
+                    type: string
+                    example: "IllegalAccessException"
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: "You are not authorized to access this API"
+    get:
+      summary: receive incident change notifications via query parameters
+      description: Sends a callbackUrl via GET with incidentId and callbackUrl as query parameters when an incident changes.
+      parameters:
+        - name: incidentId
+          in: query
+          required: true
+          description: The ID of the incident that changed.
+          schema:
+            type: string
+            example: f806607f87a6f9d03efcec0000000000
+        - name: callbackUrl
+          in: query
+          required: true
+          description: The URL where the callback should be sent.
+          schema:
+            type: string
+            example: https://<MyIT-url>/api/x_ssagd_inc_rest/rest/incident?partnerId=systemX&incidentId=f806607f87a6f9d03efcec0000000000
+      responses:
+        '200':
+          description: Callback request successful.
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "'incidentId' or 'callbackUrl' not specified"
+                  status:
+                    type: integer
+                    example: 400
+        '403':
+          description: Forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clazz:
+                    type: string
+                    example: "IllegalAccessException"
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: "You are not authorized to access this API"
+
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+
