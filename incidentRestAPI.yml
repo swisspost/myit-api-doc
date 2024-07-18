@@ -65,6 +65,10 @@ paths:
                         description: the name of the file
                         example: "picture_of_the_problem.png"
                         type: string
+                      content_type:
+                        description: the mime type of the file
+                        example: "image/png"
+                        type: string
                       content:
                         type: string
                         description: the content of the file in base64
@@ -141,7 +145,8 @@ paths:
                         {
                           "filename": "thisIsAFileName.pdf",
                           "content_type": "application/pdf",
-                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e12334567890000000"
+                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e12334567890000000",
+                          "sys_id": "12f0297d87544e12334567890000000"
                         }
                       ]
                     }
@@ -270,7 +275,8 @@ paths:
                         {
                           "filename": "thisIsAFileName.pdf",
                           "content_type": "application/pdf",
-                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e12334567890000000"
+                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e12334567890000000",
+                          "sys_id": "12f0297d87544e12334567890000000"
                         }
                       ]
                     }
@@ -393,7 +399,8 @@ paths:
                         {
                           "filename": "thisIsAFileName.pdf",
                           "content_type": "application/pdf",
-                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e12334567890000000"
+                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e12334567890000000",
+                          "sys_id": "12f0297d87544e12334567890000000"
                         }
                       ]
                     }
@@ -442,32 +449,36 @@ paths:
               type: object
               properties:
                 partnerId:
+                  description: the id of the partner system, agreed upon with the MyIT team.
+                  example: "SystemX"
                   type: string
                 incidentId:
+                  description: The MyIT-internal id of the incident.
+                  example: 6d101e0487e3ca903ef00000000000
                   type: string
                 partnerIncidentId:
+                  description: your internal id of the incident, for your reference.
+                  example: "1234567890"
                   type: string
                 attachments:
+                  description: any attachments you'd like to add to the incident. The content must be base64 encoded.
                   type: array
                   items:
                     type: object
                     properties:
                       fileName:
+                        description: the name of the file
+                        example: "picture_of_the_problem.png"
+                        type: string
+                      content_type:
+                        description: the mime type of the file
+                        example: "image/png"
                         type: string
                       content:
                         type: string
+                        description: the content of the file in base64
+                        example: c25lYWt5
                         format: byte
-            example: {
-              "partnerId":"systemX",
-              "incidentId":"43c569a98771f5106dc8630000000000",
-              "partnerIncidentId":"INC0000001",
-              "attachments": [
-                {
-                  "fileName" : "thisIsAFileName.txt",
-                  "content" : "c25lYWt5"
-                }
-              ]
-            }
 
       responses:
         '200':
@@ -512,7 +523,8 @@ paths:
                             {
                               "filename": "thisIsAFileName.txt",
                               "content_type": "application/json",
-                              "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=af0192da874481234567890123456789"
+                              "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=af0192da874481234567890123456789",
+                              "sys_id": "af0192da874481234567890123456789"
                             }
                           ]
                         
