@@ -147,7 +147,13 @@ paths:
                           "content_type": "application/pdf",
                           "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e12334567890000000",
                           "sys_id": "12f0297d87544e12334567890000000"
-                        }
+                        },
+                        {
+                          "filename": "picture_of_the_problem.png",
+                          "content_type": "image/png",
+                          "download_url": "https://<MyIT-url>/sys_attachment.do?sys_id=12f0297d87544e12334567890000001",
+                          "sys_id": "12f0297d87544e12334567890000001"
+                        },
                       ]
                     }
 
