@@ -28,7 +28,7 @@ paths:
                   example: "SystemX"
                   type: string
                 partnerIncidentId:
-                  description: your internal id of the incident, for your reference.
+                  description: your internal id of the incident, for your reference. Note that this must be unique. Once an incident is closed however - the id is freed up again.
                   example: "1234567890"
                   type: string
                 description:
@@ -227,7 +227,7 @@ paths:
         - name: partnerIncidentId
           in: query
           required: true
-          description: your internal id of the incident, for your reference.
+          description: your internal id of the incident, for your reference.  Note that this must be unique. Once an incident is closed however - the id is freed up again.
           example: "1234567890"
           schema:
             type: string
@@ -338,7 +338,7 @@ paths:
                   example: 43c569a98771f5106dc8630000000000
                   type: string
                 partnerIncidentId:
-                  description: your internal id of the incident, for your reference.
+                  description: your internal id of the incident, for your reference.  Note that this must be unique. Once an incident is closed however - the id is freed up again.
                   example: "1234567890"
                   type: string
                 short_description:
@@ -464,7 +464,7 @@ paths:
                   example: 6d101e0487e3ca903ef00000000000
                   type: string
                 partnerIncidentId:
-                  description: your internal id of the incident, for your reference.
+                  description: your internal id of the incident, for your reference.  Note that this must be unique. Once an incident is closed however - the id is freed up again.
                   example: "1234567890"
                   type: string
                 attachments:
