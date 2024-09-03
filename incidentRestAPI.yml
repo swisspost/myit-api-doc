@@ -31,6 +31,10 @@ paths:
                   description: your internal id of the incident, for your reference. Note that this must be unique. Once an incident is closed however - the id is freed up again.
                   example: "1234567890"
                   type: string
+                channel:
+                  description: possible values are 'monitoring' or 'vendor'. If you are an external vendor, please choose 'vendor'. If you are an internal event-monitoring system, please choose 'monitoring'.
+                  example: "vendor"
+                  type: string
                 description:
                   description: the descriptive title of the incident.
                   example: "Some problem with something"
@@ -52,7 +56,7 @@ paths:
                   example: "w010xq"
                   type: string
                 causing_ci:
-                  description: the name or sys-id of the underlying causing configuration item. If you don't know what to put here, please ask your swisspost contact.
+                  description: the name or sys-id of the underlying causing configuration item. If you don't know what to put here, please ask your swisspost contact. This is mandatory only for systems of channel 'monitoring'.
                   example: "w010xq"
                   type: string
                 attachments:
@@ -77,9 +81,9 @@ paths:
               required:
                 - partnerId
                 - partnerIncidentId
+                - channel
                 - description
                 - short_description
-                - causing_ci
 
       responses:
         '200':
@@ -107,6 +111,7 @@ paths:
                     example: {
                         "incidentId": "6d101e0487e3ca903ef00000000000",
                         "number": "INC0000001",
+                        "channel" : "vendor",
                         "partnerIncidentId": "1234567890",
                         "description" : "Some problem with something",
                         "short_description": "There is a complicated problem with the incident rest api - HELP!",
