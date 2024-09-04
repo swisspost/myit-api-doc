@@ -47,10 +47,6 @@ paths:
                   description: the name or sys-id of the concerned location. If you don't know what to put here, please ask your swisspost contact.
                   example: "afeeadcb8776c6103efc00000000"
                   type: string
-                assignment_group:
-                  description: the name or sys-id of the assignment_group this incident should be assigned to. If you don't know what to put here, please ask your swisspost contact.
-                  example: "DEVOPS-MYIT"
-                  type: string
                 cmdb_ci:
                   description: the name or sys-id of the concerned configuration item. If you don't know what to put here, please ask your swisspost contact.
                   example: "w010xq"
