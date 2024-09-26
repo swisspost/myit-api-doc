@@ -34,10 +34,18 @@ jobs:
 
       - name: Generate HTML files
         run: |
-          for file in ./*.yml dispoAPI/*.yml; do
+          # Generate HTML for YAML files in root directory
+          for file in ./*.yml; do
             if [ -f "$file" ]; then
-              dir=$(dirname "$file")
-              output_html="${dir}/index.html"
+              output_html="${file%.*}.html"
+              redocly build-docs -o "$output_html" "$file"
+            fi
+          done
+
+          # Generate HTML for YAML files in dispoAPI directory
+          for file in dispoAPI/*.yml; do
+            if [ -f "$file" ]; then
+              output_html="dispoAPI/index.html"
               redocly build-docs -o "$output_html" "$file"
             fi
           done
