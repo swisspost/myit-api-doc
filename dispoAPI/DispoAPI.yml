@@ -1,327 +1,77 @@
-openapi: '3.0.2'
-info:
-  title: DispoAPI
-  description: handles inventory changes in MyIT cmdb for DispoTool.
-  version: '0.0.1'
+name: Generate html from yml docs and publish to pages
 
-servers:
-  - url: https://myit-dev.post.ch/api/x_ssagd_dispoapi/dispoapi
-    description: development server
+on:
+  push:
+    branches:
+      - main
 
-security:
-  - BasicAuth: []
-  
-paths:
-  /switchDevice:
-    patch:
-      summary: Switches one device for another in the cmdb, including any children the old device might have had.
-      description: tbd
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                inventoryNumber_old:
-                  description: "The asset tag of the old device."
-                  type: string
-                inventoryNumber_new:
-                  description: "The asset tag of the new device."
-                  type: string
-                storage_location:
-                  description: "The sys-id of the storage location of the old device."
-                  type: string
-                technician:
-                  description: "The technician performing the action. This string will appear in the activity stream."
-                  type: string
-                comment:
-                  description: "A comment composed by the technician that will appear in the activity stream."
-                  type: string
-              required:
-                - inventoryNumber_old
-                - inventoryNumber_new
-                - storage_location
-                - technician
-                - comment
+jobs:
+  generate_docs:
+    name: Generate HTML Docs
+    runs-on: ubuntu-latest
 
-      responses:
-        '200':
-          description: OK
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Device 23282978 was switched for 23271091 successfully."
-        '400':
-          description: bad request
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "MyItRestException"
-                  message:
-                    type: string
-                    example: "inventoryNumber_old is missing or null in the request body."
-                  status:
-                    type: integer
-                    example: 400
-        '403':
-          description: forbidden
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  clazz:
-                    type: string
-                    example: "IllegalAccessException"
-                  status:
-                    type: integer
-                    example: 403
-                  message:
-                    type: string
-                    example: "You are not authorized to access this API"
-        '500':
-          description: Internal Server Error
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  clazz:
-                    type: string
-                    example: "MyItRestException"
-                  status:
-                    type: integer
-                    example: 500
-                  message:
-                    type: string
-                    example: "something went wrong while writing data to the new device"
+    permissions:
+      contents: write
 
-  /installDevice:
-    patch:
-      summary: Installs a device in the cmdb
-      description: tbd
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                inventoryNumber:
-                  description: "The asset tag of the device."
-                  type: string
-                location:
-                  description: "The location of the device."
-                  type: string
-                technician:
-                  description: "The technician performing the action. This string will appear in the activity stream."
-                  type: string
-                comment:
-                  description: "A comment composed by the technician that will appear in the activity stream."
-                  type: string
-                assigned_to:
-                  description: "The sys-id of the user of the device."
-                  type: string
-                cost_center:
-                  description: "The sys-id of the cost-center of the device."
-                  type: string
-                children:
-                  description: "Any children to install alongside the device containing the sys-id of the child as well as the name of the relation."
-                  type: array
-                  example: [
-                    {
-                    "child" : "0007047387bb39d06dc863540cbb0000",
-                    "relation" : "Connects to::Connected by"
-                    },
-                    {
-                    "child" : "0007047387bb39d06dc863540cbb0001",
-                    "relation" : "Connects to::Connected by"
-                    }
-                  ]
-                parents:
-                  description: "Any parents the device has containing the sys-id of the parent as well as the name of the relation."
-                  type: array
-                  example: [
-                    {
-                    "parent" : "0007047387bb39d06dc863540cbb0000",
-                    "relation" : "Connects to::Connected by"
-                    }
-                  ]
-              required:
-                - inventoryNumber
-                - location
-                - technician
-                - comment
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Device 23282978 was installed successfully."
-        '400':
-          description: bad request
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "MyItRestException"
-                  message:
-                    type: string
-                    example: "inventoryNumber is missing or null in the request body."
-                  status:
-                    type: integer
-                    example: 400
-        '403':
-          description: forbidden
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  clazz:
-                    type: string
-                    example: "IllegalAccessException"
-                  status:
-                    type: integer
-                    example: 403
-                  message:
-                    type: string
-                    example: "You are not authorized to access this API"
-        '500':
-          description: Internal Server Error
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  clazz:
-                    type: string
-                    example: "MyItRestException"
-                  status:
-                    type: integer
-                    example: 500
-                  message:
-                    type: string
-                    example: "something went wrong writing data to the new device"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
 
-  /uninstallDevice:
-    patch:
-      summary: Uninstalls a device in the cmdb including any children passed in the request.
-      description: tbd
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                inventoryNumber:
-                  description: "The asset tag of the device."
-                  type: string
-                storage_location:
-                  description: "The sys-id of the storage location of the device."
-                  type: string
-                technician:
-                  description: "The technician performing the action. This string will appear in the activity stream."
-                  type: string
-                comment:
-                  description: "A comment composed by the technician that will appear in the activity stream."
-                  type: string
-                children:
-                  description: "The list of sys-id's of children to uninstall alongside the parent-device. This has to exactly match the existing children in the cmdb."
-                  type: array
-                  example: [
-                    {
-                    "child" : "0007047387bb39d06dc863540cbb0000"
-                    },
-                    {
-                    "child" : "0007047387bb39d06dc863540cbb0001"
-                    }
-                  ]
+      - name: Check for .yml files
+        run: |
+          if ls ./*.yml dispoAPI/*.yml 1> /dev/null 2>&1; then
+            echo "YAML files found."
+          else
+            echo "No YAML files found. Exiting."
+            exit 1
+          fi
 
-              required:
-                - inventoryNumber
-                - storage_location
-                - technician
-                - comment
-                
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Device 23282978 was uninstalled successfully."
-        '400':
-          description: bad request
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: "MyItRestException"
-                  message:
-                    type: string
-                    example: "inventoryNumber is missing or null in the request body."
-                  status:
-                    type: integer
-                    example: 400
-        '403':
-          description: forbidden
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  clazz:
-                    type: string
-                    example: "IllegalAccessException"
-                  status:
-                    type: integer
-                    example: 403
-                  message:
-                    type: string
-                    example: "You are not authorized to access this API"
-        '500':
-          description: Internal Server Error
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  clazz:
-                    type: string
-                    example: "MyItRestException"
-                  status:
-                    type: integer
-                    example: 500
-                  message:
-                    type: string
-                    example: "something went wrong writing data to the device"
+      - name: Install Node.js
+        uses: actions/setup-node@v4.0.2
 
-components:
-  securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
+      - name: Install Redocly CLI
+        run: npm install -g @redocly/cli
 
+      - name: Generate HTML files
+        run: |
+          # Generate HTML for YAML files in root directory
+          for file in ./*.yml; do
+            if [ -f "$file" ]; then
+              output_html="${file%.*}.html"
+              redocly build-docs -o "$output_html" "$file"
+            fi
+          done
+
+          # Generate HTML for YAML files in dispoAPI directory
+          for file in dispoAPI/*.yml; do
+            if [ -f "$file" ]; then
+              output_html="dispoAPI/index.html"
+              redocly build-docs -o "$output_html" "$file"
+            fi
+          done
+
+      - name: Add noIndex Meta Tag
+        run: |
+          for file in ./*.html dispoAPI/*.html; do
+            if [ -f "$file" ]; then
+              echo "Found HTML file: $file"
+              if sed -i '/<head>/a <meta name="robots" content="noindex">' "$file"; then
+                echo "Added meta tag to $file successfully."
+              else
+                echo "Failed to add meta tag to $file."
+              fi
+            fi
+          done
+        shell: bash
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: .  # Root folder where HTML files are located
