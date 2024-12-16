@@ -585,18 +585,14 @@ paths:
                       {
                         'number': 'INC0000001',
                         'short_description': 'short description',
-                        'priority': 4,
                         'opened_by:':
                           {
                             'active': true,
                             'sys_class_name': 'sys_user',
                             'sys_id': 'a6fb235587fc71503efcec000000000'
                           },
-                        'severity': 3,
                         'opened_at': '2023-10-10T07:22:04Z',
-                        'category': 'service_request',
                         'incident_id': '43c569a98771f5106dc8630000000000',
-                        'class': 'incident',
                         'attachments':
                           [
                             {
@@ -691,18 +687,15 @@ paths:
                       {
                         'number': 'INC0000001',
                         'short_description': 'short description',
-                        'priority': 4,
                         'opened_by:':
                           {
                             'active': true,
                             'sys_class_name': 'sys_user',
                             'sys_id': 'a6fb235587fc71503efcec000000000'
                           },
-                        'severity': 3,
                         'opened_at': '2023-10-10T07:22:04Z',
                         'category': 'service_request',
                         'incident_id': '43c569a98771f5106dc8630000000000',
-                        'class': 'incident',
                         'worknotes':
                           [
                             {
@@ -805,18 +798,14 @@ paths:
                       {
                         'number': 'INC0000001',
                         'short_description': 'short description',
-                        'priority': 4,
                         'opened_by:':
                           {
                             'active': true,
                             'sys_class_name': 'sys_user',
                             'sys_id': 'a6fb235587fc71503efcec000000000'
                           },
-                        'severity': 3,
                         'opened_at': '2023-10-10T07:22:04Z',
-                        'category': 'service_request',
                         'incident_id': '43c569a98771f5106dc8630000000000',
-                        'class': 'incident',
                         'worknotes':
                           [
                             {
@@ -924,18 +913,14 @@ paths:
                       {
                         'number': 'INC0000001',
                         'short_description': 'short description',
-                        'priority': 4,
                         'opened_by:':
                           {
                             'active': true,
                             'sys_class_name': 'sys_user',
                             'sys_id': 'a6fb235587fc71503efcec000000000'
                           },
-                        'severity': 3,
                         'opened_at': '2023-10-10T07:22:04Z',
-                        'category': 'service_request',
                         'incident_id': '43c569a98771f5106dc8630000000000',
-                        'class': 'incident',
                         'worknotes':
                           [
                             {
@@ -1043,18 +1028,14 @@ paths:
                       {
                         'number': 'INC0000001',
                         'short_description': 'short description',
-                        'priority': 4,
                         'opened_by:':
                           {
                             'active': true,
                             'sys_class_name': 'sys_user',
                             'sys_id': 'a6fb235587fc71503efcec000000000'
                           },
-                        'severity': 3,
                         'opened_at': '2023-10-10T07:22:04Z',
-                        'category': 'service_request',
                         'incident_id': '43c569a98771f5106dc8630000000000',
-                        'class': 'incident',
                         'worknotes':
                           [
                             {
@@ -1131,24 +1112,12 @@ paths:
                 short_description:
                   type: string
                   example: 'update'
-                priority:
-                  type: number
-                  example: 1
-                severity:
-                  type: number
-                  example: 2
                 opened_at:
                   type: string
                   example: '2023-11-23T09:16:47Z'
-                category:
-                  type: string
-                  example: 'service_request'
                 incident_id:
                   type: string
                   example: 'f806607f87a6f9d03efcec0000000000'
-                class:
-                  type: string
-                  example: 'incident'
       responses:
         '200':
           description: Callback request description. Actual response handling is managed by the receiving system.
