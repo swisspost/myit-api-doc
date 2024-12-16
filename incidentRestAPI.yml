@@ -1,7 +1,16 @@
 openapi: '3.0.2'
 info:
   title: Incident REST API
-  description: handles communication between the MyIT incident system and partner systems.
+  description: |
+    Handles communication between the MyIT incident system and partner systems.
+    
+    **State values:**
+    - New: 1
+    - In progress: 2
+    - On hold: 3
+    - Resolved: 6
+    - Closed: 7
+    - Cancelled: 8
   version: '1.0.0'
 
 servers:
