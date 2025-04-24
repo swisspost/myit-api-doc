@@ -1089,12 +1089,12 @@ paths:
                     type: string
                     example: 'failure'
 
-  /callback:
+  / receive updates about new or changed incidents:
     post:
-      summary: Notification via POST request
-      description: Sends a POST request to the partner's callback URL when an incident changes containing the complete incident.
+      summary: Receive info on new or changed incidents.
+      description: Sends a POST request to an endpoint provided by the partnersystem containing the new or changed incident data.
       requestBody:
-        description: The incident data sent to the callback URL.
+        description: The incident data sent to the endpoint provided to us by the partnersystem.
         content:
           application/json:
             schema:
@@ -1118,33 +1118,41 @@ paths:
                 incident_id:
                   type: string
                   example: 'f806607f87a6f9d03efcec0000000000'
+                action:
+                  type: string
+                  description: value describing what the causing action of the notification incidents. Possible values are 'new', 'update', 'worknote', 'comment', 'attachment', 'cancel'.
+                  example: 'new'
       responses:
         '200':
-          description: Callback request description. Actual response handling is managed by the receiving system.
+          description: Callback request description. Actual response handling is managed by the receiving system. We expect a 2xx Status if successful.
         'default':
-          description: General response. Actual response handling is managed by the receiving system.
+          description: General response. Actual response handling is managed by the receiving system. We expect a 2xx Status if successful.
 
-    get:
-      summary: Notification via GET request
-      description: Sends a GET request to the partner's callback URL with incidentId and callbackUrl as query parameters when an incident changes. This URL can be queried with GET to then receive the changed incident.
-      parameters:
-        - name: incidentId
-          in: query
-          description: The ID of the incident that changed.
-          schema:
-            type: string
-            example: f806607f87a6f9d03efcec0000000000
-        - name: callbackUrl
-          in: query
-          description: The readymade URL leading to the changed incident.
-          schema:
-            type: string
-            example: https://<MyIT-url>/api/x_ssagd_inc_rest/rest/incident?partnerId=systemX&incidentId=f806607f87a6f9d03efcec0000000000
+    post:
+      summary: Similar to the above method, but instead of the complete incident data, we only send a callback URL for you to GET.
+      description:  Sends a POST request to an endpoint provided by the partnersystem containing a callback URL, the partnersystem can use to get the incident data in their own time.
+      requestBody:
+        description: The incident data sent to the endpoint provided to us by the partnersystem.
+        content:
+          application/json:
+            schema:
+            incident_id:
+              description: The ID of the incident that changed.
+              type: string
+              example: f806607f87a6f9d03efcec0000000000
+            callbackUrl:
+              description: The readymade URL leading to the changed incident.
+              type: string
+              example: https://<MyIT-url>/api/x_ssagd_inc_rest/rest/incident?partnerId=systemX&incidentId=f806607f87a6f9d03efcec0000000000
+            action:
+              type: string
+              description: value describing what the causing action of the notification incidents. Possible values are 'new', 'update', 'worknote', 'comment', 'attachment', 'cancel'.
+              example: 'new'
       responses:
         '200':
-          description: Callback request description. Actual response handling is managed by the receiving system.
+          description: Callback request description. Actual response handling is managed by the receiving system. We expect a 2xx Status if successful.
         'default':
-          description: General response. Actual response handling is managed by the receiving system.
+          description: General response. Actual response handling is managed by the receiving system. We expect a 2xx Status if successful.
 
 components:
   securitySchemes:
