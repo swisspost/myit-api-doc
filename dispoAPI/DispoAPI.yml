@@ -133,24 +133,24 @@ paths:
                   description: "The sys-id of the cost-center of the device."
                   type: string
                 children:
-                  description: "Any children to install alongside the device containing the sys-id of the child as well as the name of the relation."
+                  description: "Any children to install alongside the device containing the asset_tag of the child as well as the name of the relation."
                   type: array
                   example: [
                     {
-                    "child" : "0007047387bb39d06dc863540cbb0000",
+                    "child" : "25614826",
                     "relation" : "Connects to::Connected by"
                     },
                     {
-                    "child" : "0007047387bb39d06dc863540cbb0001",
+                    "child" : "25614827",
                     "relation" : "Connects to::Connected by"
                     }
                   ]
                 parents:
-                  description: "Any parents the device has containing the sys-id of the parent as well as the name of the relation."
+                  description: "Any parents the device has containing the asset_tag of the parent as well as the name of the relation."
                   type: array
                   example: [
                     {
-                    "parent" : "0007047387bb39d06dc863540cbb0000",
+                    "parent" : "25614828",
                     "relation" : "Connects to::Connected by"
                     }
                   ]
@@ -242,14 +242,14 @@ paths:
                   description: "A comment composed by the technician that will appear in the activity stream."
                   type: string
                 children:
-                  description: "The list of sys-id's of children to uninstall alongside the parent-device. This has to exactly match the existing children in the cmdb."
+                  description: "The list of asset_tags of children to uninstall alongside the parent-device. This has to exactly match the existing children in the cmdb."
                   type: array
                   example: [
                     {
-                    "child" : "0007047387bb39d06dc863540cbb0000"
+                    "child" : "25614826"
                     },
                     {
-                    "child" : "0007047387bb39d06dc863540cbb0001"
+                    "child" : "25614827"
                     }
                   ]
 
