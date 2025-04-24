@@ -1091,7 +1091,7 @@ paths:
 
   / receive concise updates about new or changed incidents:
     post:
-      summary: Similar to the below method, but instead of the complete incident data, we only send a callback URL for you to GET.
+      summary: Receive concise info on new or changed incidents.
       description:  Sends a POST request to an endpoint provided by the partnersystem containing a callback URL, the partnersystem can use to get the incident data in their own time.
       requestBody:
         description: The incident data sent to the endpoint provided to us by the partnersystem.
@@ -1120,7 +1120,7 @@ paths:
 
   / receive detailed updates about new or changed incidents:
     post:
-      summary: Receive info on new or changed incidents.
+      summary: Receive detailed info on new or changed incidents.
       description: Sends a POST request to an endpoint provided by the partnersystem containing the new or changed incident data.
       requestBody:
         description: The incident data sent to the endpoint provided to us by the partnersystem.
