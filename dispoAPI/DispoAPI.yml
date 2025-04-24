@@ -319,6 +319,121 @@ paths:
                     type: string
                     example: "something went wrong writing data to the device"
 
+  /mutateDevice:
+    patch:
+      summary: Mutates one or more fields on an existing device
+      description: |
+        Simply sets a few fields on a device.  
+        At least one of the optional parameters (cost_center, assigned_to, location, operationalArea or condition) must be provided.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inventoryNumber:
+                  description: The asset tag of the device.
+                  type: string
+                technician:
+                  description: The technician performing the action. This string will appear in the activity stream.
+                  type: string
+                comment:
+                  description: A comment composed by the technician that will appear in the activity stream.
+                  type: string
+                cost_center:
+                  description: The sys-id of the cost-center to update.
+                  type: string
+                assigned_to:
+                  description: The sys-id of the user to assign the device to.
+                  type: string
+                location:
+                  description: The sys-id of the location to set on the device.
+                  type: string
+                operationalArea:
+                  description: The operational area to set on the device.
+                  type: string
+                condition:
+                  description: The condition to set on the device.
+                  type: string
+              required:
+                - inventoryNumber
+                - technician
+                - comment
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Device 23282978 was mutated successfully."
+        '400':
+          description: Bad Request (missing/invalid body or no optional fields provided)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "You must set at least one of the optional parameters: cost_center, assigned_to, location, operationalArea or condition"
+                  status:
+                    type: integer
+                    example: 400
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clazz:
+                    type: string
+                    example: "IllegalAccessException"
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: "You are not authorized to access this API"
+        '404':
+          description: Not Found (device not present in CMDB)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "MyItRestException"
+                  message:
+                    type: string
+                    example: "Device with inventoryNumber 12345 not found in MyIT."
+                  status:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clazz:
+                    type: string
+                    example: "MyItRestException"
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: "something went wrong while writing data to the device"
 components:
   securitySchemes:
     BasicAuth:
