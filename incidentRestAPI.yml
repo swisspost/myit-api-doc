@@ -1089,6 +1089,152 @@ paths:
                     type: string
                     example: 'failure'
 
+  /incident/assign:
+    patch:
+      summary: assign an incident to an assignment group
+      description: |
+        Assigns an existing incident in myIT to an assignment group. 'partnerId' AND either 'incidentId' OR 'partnerIncidentId' must either be in the body or the query params.
+
+        **Note:** this endpoint is not available by default. It must be explicitly enabled for your partner config by the MyIT team. If you'd like to use it, please get in touch with us.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partnerId:
+                  description: the id of the partner system, agreed upon with the MyIT team.
+                  example: 'SystemX'
+                  type: string
+                incidentId:
+                  description: The MyIT-internal id of the incident.
+                  example: 43c569a98771f5106dc8630000000000
+                  type: string
+                partnerIncidentId:
+                  description: your internal id of the incident, for your reference. Note that this must be unique. Once an incident is closed however - the id is freed up again.
+                  example: '1234567890'
+                  type: string
+                assignment_group:
+                  description: the name or sys_id of the assignment group the incident should be assigned to.
+                  example: 'BETR-MYIT'
+                  type: string
+              required:
+                - partnerId
+                - incidentId
+                - partnerIncidentId
+                - assignment_group
+
+      responses:
+        '200':
+          description: the assigned incident
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object
+                    example:
+                      {
+                        'config': 'SystemX',
+                        'partnerId': 'SystemX',
+                        'server_system_time': '2020-10-24T06:23:41.089Z'
+                      }
+
+                  message:
+                    type: string
+                    example: 'Incident 43c569a98771f5106dc8630000000000 assigned to Example groupname.'
+
+                  data:
+                    type: object
+                    example:
+                      {
+                        'incidentId': '6d101e0487e3ca903ef00000000000',
+                        'number': 'INC0000001',
+                        'partnerIncidentId': '1234567890',
+                        'short_description': 'short description',
+                        'state': 2,
+                        'opened_at': '1997-09-08T05:55:00Z',
+                        'sys_updated_on': '2024-07-17T14:36:59Z',
+                        'opened_by':
+                          {
+                            'first_name': 'Example',
+                            'last_name': 'Name',
+                            'user_name': 'example_name'
+                          },
+                        'assignment_group':
+                          {
+                            'description': 'Example group',
+                            'name': 'Example groupname'
+                          }
+                      }
+
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: 'MyItRestException'
+                  message:
+                    type: string
+                    example: "Missing 'assignment_group'. This is either because you forgot to add it in the request, or an internal configuration issue. If you think the latter is the case, please contact the MyIT-Team."
+                  status:
+                    type: integer
+                    example: 400
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    example:
+                      {
+                        'message': 'User Not Authenticated',
+                        'detail': 'Required to provide Auth information'
+                      }
+                  status:
+                    type: string
+                    example: 'failure'
+        '403':
+          description: forbidden - the partner config does not allow assignments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: 'MyItRestException'
+                  message:
+                    type: string
+                    example: 'Your config does not allow making assignments. Please contact the MyIT-Team.'
+                  status:
+                    type: integer
+                    example: 403
+        '404':
+          description: the specified assignment group could not be found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: 'MyItRestException'
+                  message:
+                    type: string
+                    example: 'Assignment group afeeadcb8776c6103efc00000000 not found.'
+                  status:
+                    type: integer
+                    example: 404
+
   / receive concise updates about new or changed incidents:
     post:
       summary: Receive concise info on new or changed incidents.
